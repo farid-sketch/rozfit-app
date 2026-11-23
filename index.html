@@ -49,6 +49,25 @@
   .timer{font-size:28px;font-weight:800;text-align:center}
   ul{padding-left:20px;margin:6px 0} li{margin:4px 0}
   .warn{color:var(--warn)}
+
+  .tick{flex:none;width:44px;height:44px;border-radius:50%;border:3px solid var(--acc);background:transparent;color:#04210f;font-size:26px;font-weight:900;cursor:pointer;line-height:1;margin-top:2px}
+  .ex.done .tick{background:var(--acc)}
+  .ex.done{opacity:.75}
+  .vbox{position:relative;margin-top:8px;border-radius:12px;overflow:hidden;cursor:pointer;aspect-ratio:16/9;background:#000;max-width:100%}
+  .vbox img{width:100%;height:100%;object-fit:cover;display:block;opacity:.85}
+  .vbox .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:rgba(239,68,68,.95);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;padding-left:4px}
+  .vbox .vlab{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.7);color:#fff;font-size:13px;padding:3px 8px;border-radius:6px}
+  .vframe{position:relative;margin-top:8px;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#000}
+  .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .big-start{font-size:18px;padding:16px}
+  .guide{position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;padding:12px 16px calc(24px + env(safe-area-inset-bottom))}
+  .gin{max-width:560px;margin:0 auto}
+  .gtop{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:14px;margin-bottom:8px;padding-top:env(safe-area-inset-top)}
+  .gx{background:none;border:1px solid var(--line);color:var(--txt);border-radius:10px;width:44px;height:44px;font-size:18px;cursor:pointer}
+  .btn.huge{font-size:20px;padding:20px}
+  .tag.big{font-size:15px;color:var(--txt);border-color:var(--acc)}
+  .huge-t{font-size:64px;margin:10px 0}
+  .btn:disabled{opacity:.4}
   table{width:100%;border-collapse:collapse;font-size:14px} td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top}
 </style>
 </head>
@@ -224,27 +243,78 @@ function buildPlan(p){
 const $ = s=>document.querySelector(s);
 const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function todayKey(){return DAYS[(new Date().getDay()+6)%7]}
-function dateStr(d=new Date()){return d.toISOString().slice(0,10)}
-/* How-to videos: add a link per exercise name when the videos are made.
-   Until then the app shows "Video coming soon" plus a free YouTube search link. */
+function dateStr(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+/* How-to videos: YouTube video ID per exercise (short form demos, embeddable).
+   Swap any ID to change the video. Replace with our own AI videos later. */
 const VIDEOS = {
-  // "Push-ups": "https://…/push-ups.mp4",
+  "Barbell bench press": "lWFknlOTbyM",
+  "Incline dumbbell press": "IP4oeKh1Sd4",
+  "Lat pulldown": "xnKhC4m9dLE",
+  "Cable chest fly": "tYxbYHT3EAc",
+  "Push-ups": "IODxDxX7oi4",
+  "Wide push-ups": "EsIdzx1J0iA",
+  "Feet-elevated push-ups": "xoX1nSewXgA",
+  "Towel door rows": "lPZufNTFFHQ",
+  "Seated cable row": "vwHG9Jfu4sw",
+  "Reverse snow angels": "R4iO4gXC_TY",
+  "Seated dumbbell shoulder press": "rO_iEImwHyo",
+  "Pike push-ups": "RuGjXUHRYSI",
+  "Superman hold": "J9zXkxUAfUA",
+  "Arm circles (slow)": "UVMEnIaY8aU",
+  "Dumbbell lateral raise": "pgrWjBfaFe8",
+  "Dumbbell one-arm row": "dFzUjzfih7k",
+  "Hammer curl": "BRVDS6HVR9Q",
+  "Bench / chair dips": "E7WwqwD7NWE",
+  "Prone Y-T raises": "QdGTI4Lshg4",
+  "Face pull": "3pToT5_DUiY",
+  "Cable triceps pushdown": "-zLyUAo1gMw",
+  "Dumbbell biceps curl": "XE_pHwbst04",
+  "Towel isometric curl": "astPQqDb1s4",
+  "Backpack curls": "dKqtGGScQhQ",
+  "Overhead dumbbell triceps extension": "fYqswDVbJDg",
+  "Reverse lunges": "Ry-wqegeKlE",
+  "Leg press": "K5n2vg3oZa4",
+  "Leg extension": "swZQC689o9U",
+  "Diamond push-ups": "kGhDnFwMY3E",
+  "Bodyweight squats": "YaXPRqUwItQ",
+  "Barbell back squat": "9PV96eMj_m4",
+  "Wall sit": "cWTZ8Am1Ee0",
+  "Romanian deadlift": "7j-2w4-P14I",
+  "Step-ups on a stair": "WCFCdxzFBa4",
+  "Lying leg curl": "jxctD6fL_FQ",
+  "Single-leg glute bridge": "b1zTCyGJXCQ",
+  "Single-leg hip hinge": "tX_0Pas9iNI",
+  "Glute bridge": "PhTDzR0TpZs",
+  "Barbell hip thrust": "pUdIL5x0fWg",
+  "Walking lunges": "Pbmj6xPo-Hw",
+  "Stair calf raises": "54C0vzBYPmY",
+  "Standing calf raise": "k8ipHzKeAkQ",
+  "Crunches": "9T4WQGlKCRk",
+  "Lying leg raise": "3oIpxsn6FxQ",
+  "Hanging knee raise": "l7OroezzX9k",
+  "Cable crunch": "ToJeyhydUxU",
+  "Russian twist": "wkD8rjkodUI",
+  "Plank": "6LqqeBtFn9M",
+  "Squat jumps": "A-cFYWvaHr0",
+  "Jumping jacks": "XR0xeuK5zBU",
+  "Rowing machine sprint": "1oMacNz9Q6s",
+  "Mountain climbers": "ZhiCSdOVJp0",
+  "Bicycle crunch": "eqg47ZuGZXQ",
+  "High knees": "ymdS7tM0zws",
+  "Skater hops": "9_jLW6VkU8A",
+  "Burpees": "NCqbpkoiyXE",
+  "Fast feet shuffle": "fz59j4a3QMQ",
 };
 function videoUrl(name){return "https://www.youtube.com/results?search_query="+encodeURIComponent(name+" proper form tutorial")}
-function videoHtml(name){
-  if(VIDEOS[name]) return `<a class="vid" href="${VIDEOS[name]}" target="_blank" rel="noopener">▶ Watch how to do it</a>`;
-  return `<span class="soon">🎬 Video coming soon</span> <a class="vid sm" href="${videoUrl(name)}" target="_blank" rel="noopener">or find it on YouTube</a>`;
-}
 function groupLabel(g){return{quads:"legs",hamstrings:"hamstrings",glutes:"glutes",calves:"calves",hiit:"HIIT",abs:"abs"}[g]||g}
 function getLog(){return S.get("log",{})}            // { "2026-11-23": {Mon:[true,false,...]} }
+function dayComplete(log,date){return Object.entries(log).some(([k,v])=>k.startsWith(date+"|")&&Array.isArray(v)&&v.length&&v.every(Boolean))}
 function streak(){
   const log=getLog(); let n=0; const d=new Date();
   for(let i=0;i<60;i++){
     const k=dateStr(d), wd=DAYS[(d.getDay()+6)%7];
-    if(profile.days.includes(wd)){
-      const done = log[k] && log[k].every(Boolean) && log[k].length;
-      if(done) n++; else if(i>0) break;   // today not finished yet doesn't break streak
-    }
+    if(dayComplete(log,k)) n++;
+    else if(profile.days.includes(wd) && i>0) break;   // a missed training day breaks the streak; today unfinished doesn't
     d.setDate(d.getDate()-1);
   }
   return n;
@@ -326,6 +396,22 @@ function renderOnboarding(edit){
 }
 
 /* ---------- Today / Day view ---------- */
+/* Progress is saved per date AND workout, so any day's workout can be done today. */
+function logKey(dayKey){return dateStr()+"|"+dayKey}
+function getChecks(dayKey,n){const l=getLog();const c=l[logKey(dayKey)];return (c&&c.length===n)?c:Array(n).fill(false)}
+function setChecks(dayKey,arr){const l=getLog();l[logKey(dayKey)]=arr;S.set("log",l)}
+
+function thumbHtml(name,i){
+  const id=VIDEOS[name];
+  if(!id) return `<a class="vid sm" href="${videoUrl(name)}" target="_blank" rel="noopener">▶ Find a video on YouTube</a>`;
+  return `<div class="vbox" data-vid="${id}" data-i="${i}"><img loading="lazy" alt="" src="https://i.ytimg.com/vi/${id}/hqdefault.jpg"><span class="play">▶</span><span class="vlab">Watch how to do it</span></div>`;
+}
+function playVideo(box){
+  const id=box.dataset.vid;
+  box.outerHTML=`<div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="How to do it" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`;
+}
+function bindVideos(root){root.querySelectorAll(".vbox").forEach(b=>b.onclick=()=>playVideo(b))}
+
 function renderDay(dayKey){
   const plan=S.get("plan",{}); const d=plan[dayKey];
   const isToday = dayKey===todayKey();
@@ -338,57 +424,112 @@ function renderDay(dayKey){
     html += `<button class="btn sec" id="back" style="margin-top:0">← Back to week</button>`;
   }
   if(!d){
-    const next = DAYS.slice(DAYS.indexOf(dayKey)+1).concat(DAYS).find(x=>plan[x]);
+    const others = DAYS.filter(x=>plan[x]);
     html += `<div class="card"><h2 style="margin-top:0">😴 ${DAY_FULL[dayKey]} is a rest day</h2>
-      <p>Rest is when your muscles grow. Try a 20–30 minute walk and drink plenty of water.</p>
-      ${next?`<p class="mut">Next workout: <b>${DAY_FULL[next]}</b> – ${plan[next].title}</p>`:""}</div>`;
-    $("#app").innerHTML=html; bindBack(); return;
+      <p>Rest is when your muscles grow. A 20–30 minute walk is perfect today.</p>
+      <h3 style="margin-top:14px">Want to train anyway? Pick a workout:</h3>
+      ${others.map(x=>`<button class="btn sec pickday" data-d="${x}">${DAY_FULL[x]} – ${plan[x].title}</button>`).join("")}</div>`;
+    $("#app").innerHTML=html; bindBack();
+    document.querySelectorAll(".pickday").forEach(b=>b.onclick=()=>{viewDay=b.dataset.d;tab="day";render()});
+    return;
   }
-  const key = dateStr();
-  const log = getLog();
-  const checks = (isToday&&log[key])?log[key]:Array(d.items.length).fill(false);
+  const n=d.items.length;
+  const checks = getChecks(dayKey,n);
   const done = checks.filter(Boolean).length;
   html += `<h1>${DAY_FULL[dayKey]}: ${d.title}</h1>
-    <p class="mut">${d.items.length} exercises · about ${profile.minutes} min · rest 60–90 sec between sets</p>
-    ${isToday?`<div class="bar" style="margin:10px 0"><i id="pbar" style="width:${done/d.items.length*100}%"></i></div>
-    <p class="mut" id="ptxt">${done} of ${d.items.length} done</p>`:`<p class="mut">You can tick these off on ${DAY_FULL[dayKey]}.</p>`}
+    <p class="mut">${n} exercises · about ${profile.minutes} min${isToday?"":" · you can do this one today"}</p>
+    <button class="btn big-start" id="start">${done===0?"▶ Start workout":done===n?"✅ Workout done – do it again":"▶ Continue workout ("+done+"/"+n+")"}</button>
+    <div class="bar" style="margin:12px 0 4px"><i id="pbar" style="width:${done/n*100}%"></i></div>
+    <p class="mut" id="ptxt">${done} of ${n} done · tap the circle when you finish an exercise</p>
     <div class="card"><p class="mut" style="margin-top:0">🔥 Warm-up first: 5 min brisk walk or cycle, then 10 arm circles and 10 bodyweight squats.</p>`;
   let lastGroup=null;
   d.items.forEach((x,i)=>{
     if(x.group==="hiit"&&lastGroup!=="hiit") html+=`<h3 style="margin-top:14px">⚡ HIIT finisher</h3>`;
     if(x.group==="abs"&&lastGroup!=="abs") html+=`<h3 style="margin-top:14px">🎯 Abs</h3>`;
     lastGroup=x.group;
-    html += `<div class="ex ${checks[i]?"done":""}">
-      <input type="checkbox" data-i="${i}" ${checks[i]?"checked":""} ${isToday?"":"disabled"}>
-      <div><div class="nm">${esc(x.name)}</div>
+    html += `<div class="ex ${checks[i]?"done":""}" id="ex${i}">
+      <button class="tick" data-i="${i}" aria-label="Mark ${esc(x.name)} done">${checks[i]?"✓":""}</button>
+      <div style="flex:1;min-width:0"><div class="nm">${i+1}. ${esc(x.name)}</div>
         <span class="tag">${groupLabel(x.group)}</span><span class="tag">${esc(x.dose)}</span>
         ${x.cue?`<p class="mut">${esc(x.cue)}</p>`:""}
-        ${videoHtml(x.name)}
+        ${thumbHtml(x.name,i)}
       </div></div>`;
   });
-  html += `<p class="mut" style="margin-top:12px">🧊 Cool-down: 5 min easy walk + stretch the muscles you trained.</p></div>`;
-  if(isToday) html += `<div class="card"><h3>⏱ Rest timer</h3><div class="timer" id="tm">0:00</div>
-      <div class="row"><button class="btn sec" data-t="60">60s</button><button class="btn sec" data-t="90">90s</button><button class="btn sec" data-t="120">2 min</button></div></div>
-      <div class="card hide" id="congrats" style="text-align:center"><div class="big">🎉</div><h2>Workout complete!</h2><p>Great job. See you next session.</p></div>`;
-  $("#app").innerHTML=html; bindBack();
-  if(!isToday)return;
-  document.querySelectorAll(".ex input").forEach(cb=>cb.onchange=()=>{
-    const l=getLog(); l[key]=l[key]&&l[key].length===d.items.length?l[key]:Array(d.items.length).fill(false);
-    l[key][+cb.dataset.i]=cb.checked; S.set("log",l);
-    cb.closest(".ex").classList.toggle("done",cb.checked);
-    const n=l[key].filter(Boolean).length;
-    $("#pbar").style.width=(n/d.items.length*100)+"%"; $("#ptxt").textContent=`${n} of ${d.items.length} done`;
-    $("#congrats").classList.toggle("hide",n!==d.items.length);
-    if(n===d.items.length && navigator.vibrate) navigator.vibrate([100,50,100]);
+  html += `<p class="mut" style="margin-top:12px">🧊 Cool-down: 5 min easy walk + stretch the muscles you trained.</p></div>
+    <div class="card hide" id="congrats" style="text-align:center"><div class="big">🎉</div><h2>Workout complete!</h2><p>Great job. See you next session.</p></div>`;
+  $("#app").innerHTML=html; bindBack(); bindVideos($("#app"));
+  const refresh=()=>{
+    const c=getChecks(dayKey,n), k=c.filter(Boolean).length;
+    $("#pbar").style.width=(k/n*100)+"%"; $("#ptxt").textContent=`${k} of ${n} done · tap the circle when you finish an exercise`;
+    $("#congrats").classList.toggle("hide",k!==n);
+    $("#start").textContent=k===0?"▶ Start workout":k===n?"✅ Workout done – do it again":"▶ Continue workout ("+k+"/"+n+")";
+  };
+  document.querySelectorAll(".tick").forEach(b=>b.onclick=()=>{
+    const c=getChecks(dayKey,n), i=+b.dataset.i; c[i]=!c[i]; setChecks(dayKey,c);
+    b.textContent=c[i]?"✓":""; b.closest(".ex").classList.toggle("done",c[i]);
+    if(c[i]&&navigator.vibrate)navigator.vibrate(60);
+    refresh();
   });
-  if(done===d.items.length)$("#congrats").classList.remove("hide");
-  let timer=null;
-  document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{
-    clearInterval(timer); let s=+b.dataset.t; const show=()=>$("#tm").textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; show();
-    timer=setInterval(()=>{s--;show();if(s<=0){clearInterval(timer);$("#tm").textContent="Go! 💥";navigator.vibrate&&navigator.vibrate(400)}},1000);
-  });
+  $("#start").onclick=()=>startGuided(dayKey);
+  refresh();
 }
 function bindBack(){const b=$("#back");if(b)b.onclick=()=>{viewDay=null;tab="week";render()}}
+
+/* ---------- Guided workout: one exercise at a time ---------- */
+let gTimer=null;
+function startGuided(dayKey){
+  const d=S.get("plan",{})[dayKey]; const n=d.items.length;
+  let c=getChecks(dayKey,n); if(c.every(Boolean)){c=Array(n).fill(false);setChecks(dayKey,c)}
+  let i=c.findIndex(x=>!x); if(i<0)i=0;
+  const ov=document.createElement("div"); ov.className="guide"; document.body.appendChild(ov);
+  document.body.style.overflow="hidden";
+  const close=()=>{clearInterval(gTimer);ov.remove();document.body.style.overflow="";render()};
+  const show=()=>{
+    clearInterval(gTimer);
+    const x=d.items[i], id=VIDEOS[x.name], k=getChecks(dayKey,n).filter(Boolean).length;
+    ov.innerHTML=`<div class="gin">
+      <div class="gtop"><button class="gx" id="gclose">✕</button><span>Exercise ${i+1} of ${n}</span><span>${k} done</span></div>
+      <div class="bar"><i style="width:${k/n*100}%"></i></div>
+      ${id?`<div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/${id}?playsinline=1&rel=0&modestbranding=1" title="How to do ${esc(x.name)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`:""}
+      <h1>${esc(x.name)}</h1>
+      <p><span class="tag">${groupLabel(x.group)}</span><span class="tag big">${esc(x.dose)}</span></p>
+      ${x.cue?`<p>${esc(x.cue)}</p>`:""}
+      <button class="btn huge" id="gdone">✓ Done – next exercise</button>
+      <div class="row"><button class="btn sec" id="gprev" ${i===0?"disabled":""}>← Back</button><button class="btn sec" id="gskip">Skip →</button></div>
+    </div>`;
+    $("#gclose").onclick=close;
+    $("#gprev").onclick=()=>{if(i>0){i--;show()}};
+    $("#gskip").onclick=()=>next(false);
+    $("#gdone").onclick=()=>{const cc=getChecks(dayKey,n);cc[i]=true;setChecks(dayKey,cc);if(navigator.vibrate)navigator.vibrate(80);next(true)};
+  };
+  const next=(rest)=>{
+    const cc=getChecks(dayKey,n);
+    if(cc.every(Boolean)){finish();return}
+    let j=cc.findIndex((v,ix)=>!v&&ix>i); if(j<0)j=cc.findIndex(v=>!v);
+    if(!rest){i=j;show();return}
+    restScreen(j);
+  };
+  const restScreen=(j)=>{
+    let s=60; const nx=d.items[j];
+    ov.innerHTML=`<div class="gin" style="text-align:center">
+      <div class="gtop"><button class="gx" id="gclose">✕</button><span></span><span></span></div>
+      <h2>Rest</h2><div class="timer huge-t" id="gt">1:00</div>
+      <p class="mut">Drink some water. Next up:</p><h2>${esc(nx.name)}</h2>
+      <button class="btn huge" id="gnext">Skip rest – start now</button>
+      <div class="row"><button class="btn sec" id="g30">+30 sec</button></div></div>`;
+    $("#gclose").onclick=close;
+    const go=()=>{clearInterval(gTimer);i=j;show()};
+    $("#gnext").onclick=go; $("#g30").onclick=()=>{s+=30};
+    gTimer=setInterval(()=>{s--;const el=$("#gt");if(!el)return;el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;if(s<=0){if(navigator.vibrate)navigator.vibrate(400);go()}},1000);
+  };
+  const finish=()=>{
+    ov.innerHTML=`<div class="gin" style="text-align:center;padding-top:60px"><div style="font-size:72px">🎉</div><h1>Workout complete!</h1>
+      <p>Every exercise done. 🔥 Streak: <b>${streak()}</b></p><button class="btn huge" id="gend">Finish</button></div>`;
+    if(navigator.vibrate)navigator.vibrate([100,50,100]);
+    $("#gend").onclick=close;
+  };
+  show();
+}
 
 /* ---------- Week ---------- */
 function renderWeek(){
@@ -444,7 +585,7 @@ function renderMe(){
   const b=bmi(profile), [cat,cls]=bmiCat(b,profile.asian), [lo,hi]=healthyRange(profile);
   const col={ok:"var(--acc)",warn:"var(--warn)",bad:"var(--bad)"}[cls];
   const pos=Math.min(100,Math.max(0,(b-15)/(40-15)*100));
-  const log=getLog(); const total=Object.values(log).filter(a=>a.length&&a.every(Boolean)).length;
+  const log=getLog(); const total=Object.values(log).filter(a=>Array.isArray(a)&&a.length&&a.every(Boolean)).length;
   $("#app").innerHTML=`
     <h1>👤 ${esc(profile.name||"Me")}</h1>
     <div class="card"><div class="mut">Your BMI</div><div class="big" style="color:${col}">${b.toFixed(1)}</div>
