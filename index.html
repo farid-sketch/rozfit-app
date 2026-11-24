@@ -68,6 +68,27 @@
   .tag.big{font-size:15px;color:var(--txt);border-color:var(--acc)}
   .huge-t{font-size:64px;margin:10px 0}
   .btn:disabled{opacity:.4}
+
+  .cgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:12px 0}
+  .cd{aspect-ratio:1;border-radius:12px;background:#0b1222;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--mut)}
+  .cd.ok{background:var(--acc);border-color:var(--acc);color:#04210f;font-size:20px}
+  .cd.miss{border-color:#7f1d1d;color:#f87171}
+  .cd.cur{outline:3px solid var(--blue);outline-offset:1px;color:var(--txt)}
+  .cd.ms:not(.ok){border-style:dashed;border-color:var(--warn)}
+  .badges{display:flex;flex-wrap:wrap;gap:8px}
+  .badge{padding:8px 12px;border-radius:999px;border:1px solid var(--line);color:var(--mut);font-size:14px}
+  .badge.on{background:#422006;border-color:var(--warn);color:#fde68a;font-weight:700}
+  .shimg{width:100%;max-width:340px;border-radius:16px;margin:8px auto;display:block;box-shadow:0 10px 40px rgba(0,0,0,.5);-webkit-touch-callout:default}
+  nav button{font-size:11px}
+
+  .demo{position:relative;margin-top:8px;border-radius:12px;overflow:hidden;aspect-ratio:3/2;background:#fff}
+  .demo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .demo .d2{animation:rep 2.4s infinite}
+  @keyframes rep{0%,40%{opacity:0}50%,90%{opacity:1}100%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){.demo .d2{animation-duration:4s}}
+  .demo .loop{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;padding:3px 8px;border-radius:6px;max-width:85%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bigd{aspect-ratio:3/2;margin-top:4px}
+  .tut{display:inline-block;margin-top:8px;background:none;border:1px solid var(--line);color:var(--blue);border-radius:999px;padding:8px 12px;font-size:13px;cursor:pointer}
   table{width:100%;border-collapse:collapse;font-size:14px} td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top}
 </style>
 </head>
@@ -76,6 +97,7 @@
 <nav id="nav" class="hide"><div>
   <button data-tab="today"><b>✅</b>Today</button>
   <button data-tab="week"><b>📅</b>Week</button>
+  <button data-tab="challenge"><b>🏆</b>30 days</button>
   <button data-tab="diet"><b>🥗</b>Diet</button>
   <button data-tab="me"><b>👤</b>Me</button>
 </div></nav>
@@ -305,6 +327,57 @@ const VIDEOS = {
   "Burpees": "NCqbpkoiyXE",
   "Fast feet shuffle": "fz59j4a3QMQ",
 };
+/* Short looping demos: 2 photos (start + end of the rep) per exercise, from the public-domain
+   Free Exercise DB (github.com/yuhonas/free-exercise-db, Unlicense). Stored in /demos. */
+const DEMOS = {
+  "Barbell bench press": ["Barbell_Bench_Press_-_Medium_Grip_0.jpg", "Barbell_Bench_Press_-_Medium_Grip_1.jpg"],
+  "Push-ups": ["Pushups_0.jpg", "Pushups_1.jpg"],
+  "Incline dumbbell press": ["Incline_Dumbbell_Press_0.jpg", "Incline_Dumbbell_Press_1.jpg"],
+  "Feet-elevated push-ups": ["Push-Ups_With_Feet_Elevated_0.jpg", "Push-Ups_With_Feet_Elevated_1.jpg"],
+  "Cable chest fly": ["Flat_Bench_Cable_Flyes_0.jpg", "Flat_Bench_Cable_Flyes_1.jpg"],
+  "Wide push-ups": ["Push-Up_Wide_0.jpg", "Push-Up_Wide_1.jpg"],
+  "Lat pulldown": ["Wide-Grip_Lat_Pulldown_0.jpg", "Wide-Grip_Lat_Pulldown_1.jpg"],
+  "Towel door rows": ["Inverted_Row_0.jpg", "Inverted_Row_1.jpg"],
+  "Seated cable row": ["Seated_Cable_Rows_0.jpg", "Seated_Cable_Rows_1.jpg"],
+  "Superman hold": ["Superman_0.jpg", "Superman_1.jpg"],
+  "Dumbbell one-arm row": ["One-Arm_Dumbbell_Row_0.jpg", "One-Arm_Dumbbell_Row_1.jpg"],
+  "Seated dumbbell shoulder press": ["Dumbbell_Shoulder_Press_0.jpg", "Dumbbell_Shoulder_Press_1.jpg"],
+  "Dumbbell lateral raise": ["Side_Lateral_Raise_0.jpg", "Side_Lateral_Raise_1.jpg"],
+  "Arm circles (slow)": ["Arm_Circles_0.jpg", "Arm_Circles_1.jpg"],
+  "Face pull": ["Face_Pull_0.jpg", "Face_Pull_1.jpg"],
+  "Dumbbell biceps curl": ["Dumbbell_Bicep_Curl_0.jpg", "Dumbbell_Bicep_Curl_1.jpg"],
+  "Backpack curls": ["Dumbbell_Bicep_Curl_0.jpg", "Dumbbell_Bicep_Curl_1.jpg"],
+  "Hammer curl": ["Hammer_Curls_0.jpg", "Hammer_Curls_1.jpg"],
+  "Cable triceps pushdown": ["Triceps_Pushdown_0.jpg", "Triceps_Pushdown_1.jpg"],
+  "Bench / chair dips": ["Bench_Dips_0.jpg", "Bench_Dips_1.jpg"],
+  "Overhead dumbbell triceps extension": ["Standing_Dumbbell_Triceps_Extension_0.jpg", "Standing_Dumbbell_Triceps_Extension_1.jpg"],
+  "Diamond push-ups": ["Push-Ups_-_Close_Triceps_Position_0.jpg", "Push-Ups_-_Close_Triceps_Position_1.jpg"],
+  "Barbell back squat": ["Barbell_Squat_0.jpg", "Barbell_Squat_1.jpg"],
+  "Bodyweight squats": ["Bodyweight_Squat_0.jpg", "Bodyweight_Squat_1.jpg"],
+  "Leg press": ["Leg_Press_0.jpg", "Leg_Press_1.jpg"],
+  "Reverse lunges": ["Dumbbell_Rear_Lunge_0.jpg", "Dumbbell_Rear_Lunge_1.jpg"],
+  "Leg extension": ["Leg_Extensions_0.jpg", "Leg_Extensions_1.jpg"],
+  "Romanian deadlift": ["Romanian_Deadlift_0.jpg", "Romanian_Deadlift_1.jpg"],
+  "Lying leg curl": ["Lying_Leg_Curls_0.jpg", "Lying_Leg_Curls_1.jpg"],
+  "Glute bridge": ["Butt_Lift_Bridge_0.jpg", "Butt_Lift_Bridge_1.jpg"],
+  "Barbell hip thrust": ["Barbell_Hip_Thrust_0.jpg", "Barbell_Hip_Thrust_1.jpg"],
+  "Single-leg glute bridge": ["Single_Leg_Glute_Bridge_0.jpg", "Single_Leg_Glute_Bridge_1.jpg"],
+  "Walking lunges": ["Bodyweight_Walking_Lunge_0.jpg", "Bodyweight_Walking_Lunge_1.jpg"],
+  "Step-ups on a stair": ["Dumbbell_Step_Ups_0.jpg", "Dumbbell_Step_Ups_1.jpg"],
+  "Standing calf raise": ["Standing_Calf_Raises_0.jpg", "Standing_Calf_Raises_1.jpg"],
+  "Stair calf raises": ["Standing_Calf_Raises_0.jpg", "Standing_Calf_Raises_1.jpg"],
+  "Plank": ["Plank_0.jpg", "Plank_1.jpg"],
+  "Hanging knee raise": ["Knee_Hip_Raise_On_Parallel_Bars_0.jpg", "Knee_Hip_Raise_On_Parallel_Bars_1.jpg"],
+  "Lying leg raise": ["Flat_Bench_Lying_Leg_Raise_0.jpg", "Flat_Bench_Lying_Leg_Raise_1.jpg"],
+  "Cable crunch": ["Cable_Crunch_0.jpg", "Cable_Crunch_1.jpg"],
+  "Crunches": ["Crunches_0.jpg", "Crunches_1.jpg"],
+  "Russian twist": ["Russian_Twist_0.jpg", "Russian_Twist_1.jpg"],
+  "Bicycle crunch": ["Air_Bike_0.jpg", "Air_Bike_1.jpg"],
+  "Mountain climbers": ["Mountain_Climbers_0.jpg", "Mountain_Climbers_1.jpg"],
+  "Jumping jacks": ["Star_Jump_0.jpg", "Star_Jump_1.jpg"],
+  "Squat jumps": ["Freehand_Jump_Squat_0.jpg", "Freehand_Jump_Squat_1.jpg"],
+  "Rowing machine sprint": ["Rowing_Stationary_0.jpg", "Rowing_Stationary_1.jpg"],
+};
 function videoUrl(name){return "https://www.youtube.com/results?search_query="+encodeURIComponent(name+" proper form tutorial")}
 function groupLabel(g){return{quads:"legs",hamstrings:"hamstrings",glutes:"glutes",calves:"calves",hiit:"HIIT",abs:"abs"}[g]||g}
 function getLog(){return S.get("log",{})}            // { "2026-11-23": {Mon:[true,false,...]} }
@@ -390,7 +463,7 @@ function renderOnboarding(edit){
     if(!(state.heightCm>=120&&state.heightCm<=230))e.push("height");
     if(!state.days.length)e.push("at least one training day");
     if(e.length){$("#err").textContent="Please fill in: "+e.join(", ");return}
-    profile=state; S.set("profile",profile); S.set("plan",buildPlan(profile));
+    if(!state.startWeight)state.startWeight=state.weightKg; profile=state; S.set("profile",profile); S.set("plan",buildPlan(profile));
     tab="today"; viewDay=null; render();
   };
 }
@@ -401,8 +474,13 @@ function logKey(dayKey){return dateStr()+"|"+dayKey}
 function getChecks(dayKey,n){const l=getLog();const c=l[logKey(dayKey)];return (c&&c.length===n)?c:Array(n).fill(false)}
 function setChecks(dayKey,arr){const l=getLog();l[logKey(dayKey)]=arr;S.set("log",l)}
 
+function demoHtml(name,big){
+  const d=DEMOS[name]; if(!d) return "";
+  return `<div class="demo ${big?"bigd":""}" aria-label="${esc(name)} demo"><img src="demos/${d[0]}" alt=""><img class="d2" src="demos/${d[1]}" alt=""><span class="loop">↻ ${esc(name)}</span></div>`;
+}
 function thumbHtml(name,i){
-  const id=VIDEOS[name];
+  const id=VIDEOS[name], demo=demoHtml(name,false);
+  if(demo) return demo+(id?`<button class="tut" data-vid="${id}">▶ Full tutorial (YouTube)</button>`:"");
   if(!id) return `<a class="vid sm" href="${videoUrl(name)}" target="_blank" rel="noopener">▶ Find a video on YouTube</a>`;
   return `<div class="vbox" data-vid="${id}" data-i="${i}"><img loading="lazy" alt="" src="https://i.ytimg.com/vi/${id}/hqdefault.jpg"><span class="play">▶</span><span class="vlab">Watch how to do it</span></div>`;
 }
@@ -410,7 +488,7 @@ function playVideo(box){
   const id=box.dataset.vid;
   box.outerHTML=`<div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="How to do it" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`;
 }
-function bindVideos(root){root.querySelectorAll(".vbox").forEach(b=>b.onclick=()=>playVideo(b))}
+function bindVideos(root){root.querySelectorAll(".vbox,.tut").forEach(b=>b.onclick=()=>playVideo(b))}
 
 function renderDay(dayKey){
   const plan=S.get("plan",{}); const d=plan[dayKey];
@@ -456,7 +534,7 @@ function renderDay(dayKey){
       </div></div>`;
   });
   html += `<p class="mut" style="margin-top:12px">🧊 Cool-down: 5 min easy walk + stretch the muscles you trained.</p></div>
-    <div class="card hide" id="congrats" style="text-align:center"><div class="big">🎉</div><h2>Workout complete!</h2><p>Great job. See you next session.</p></div>`;
+    <div class="card hide" id="congrats" style="text-align:center"><div class="big">🎉</div><h2>Workout complete!</h2><p>Great job. See you next session.</p><button class="btn" id="lshare">📤 Share my progress</button></div>`;
   $("#app").innerHTML=html; bindBack(); bindVideos($("#app"));
   const refresh=()=>{
     const c=getChecks(dayKey,n), k=c.filter(Boolean).length;
@@ -469,8 +547,10 @@ function renderDay(dayKey){
     b.textContent=c[i]?"✓":""; b.closest(".ex").classList.toggle("done",c[i]);
     if(c[i]&&navigator.vibrate)navigator.vibrate(60);
     refresh();
+    if(c.every(Boolean))checkMilestone();
   });
   $("#start").onclick=()=>startGuided(dayKey);
+  $("#lshare").onclick=()=>openShare("workout");
   refresh();
 }
 function bindBack(){const b=$("#back");if(b)b.onclick=()=>{viewDay=null;tab="week";render()}}
@@ -490,14 +570,14 @@ function startGuided(dayKey){
     ov.innerHTML=`<div class="gin">
       <div class="gtop"><button class="gx" id="gclose">✕</button><span>Exercise ${i+1} of ${n}</span><span>${k} done</span></div>
       <div class="bar"><i style="width:${k/n*100}%"></i></div>
-      ${id?`<div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/${id}?playsinline=1&rel=0&modestbranding=1" title="How to do ${esc(x.name)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`:""}
+      ${DEMOS[x.name]?demoHtml(x.name,true)+(id?`<button class="tut" data-vid="${id}">▶ Full tutorial (YouTube)</button>`:""):id?`<div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/${id}?playsinline=1&rel=0&modestbranding=1" title="How to do ${esc(x.name)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`:""}
       <h1>${esc(x.name)}</h1>
       <p><span class="tag">${groupLabel(x.group)}</span><span class="tag big">${esc(x.dose)}</span></p>
       ${x.cue?`<p>${esc(x.cue)}</p>`:""}
       <button class="btn huge" id="gdone">✓ Done – next exercise</button>
       <div class="row"><button class="btn sec" id="gprev" ${i===0?"disabled":""}>← Back</button><button class="btn sec" id="gskip">Skip →</button></div>
     </div>`;
-    $("#gclose").onclick=close;
+    $("#gclose").onclick=close; bindVideos(ov);
     $("#gprev").onclick=()=>{if(i>0){i--;show()}};
     $("#gskip").onclick=()=>next(false);
     $("#gdone").onclick=()=>{const cc=getChecks(dayKey,n);cc[i]=true;setChecks(dayKey,cc);if(navigator.vibrate)navigator.vibrate(80);next(true)};
@@ -524,9 +604,11 @@ function startGuided(dayKey){
   };
   const finish=()=>{
     ov.innerHTML=`<div class="gin" style="text-align:center;padding-top:60px"><div style="font-size:72px">🎉</div><h1>Workout complete!</h1>
-      <p>Every exercise done. 🔥 Streak: <b>${streak()}</b></p><button class="btn huge" id="gend">Finish</button></div>`;
+      <p>Every exercise done. 🔥 Streak: <b>${streak()}</b></p><p class="mut">شاباش! آج کی ورزش مکمل</p>
+      <button class="btn huge" id="gshare">📤 Share my progress</button><button class="btn sec" id="gend">Finish</button></div>`;
+    $("#gshare").onclick=()=>{clearInterval(gTimer);ov.remove();document.body.style.overflow="";openShare("workout")};
     if(navigator.vibrate)navigator.vibrate([100,50,100]);
-    $("#gend").onclick=close;
+    $("#gend").onclick=()=>{close();checkMilestone()};
   };
   show();
 }
@@ -597,11 +679,172 @@ function renderMe(){
     <div class="stat"><div class="card"><div class="mut">Workouts finished</div><div class="big">${total}</div></div>
       <div class="card"><div class="mut">Current streak</div><div class="big">${streak()}</div></div></div>
     <div class="card"><label>Update today's weight (kg)</label><div class="row"><input id="nw" type="number" inputmode="decimal" value="${profile.weightKg}"><button class="btn" id="sw" style="margin:0;flex:0 0 90px">Save</button></div></div>
+    <p class="mut">Started at ${startWeight()} kg${kgLost()>0?` · <b style="color:var(--acc)">${kgLost()} kg lost 🎉</b>`:""}</p>
+    <button class="btn" id="shme">📤 Share my progress</button>
     <button class="btn sec" id="ed">Edit my details & plan</button>
-    <button class="btn sec" id="rs" style="color:var(--bad)">Start over (clears everything)</button>`;
+    <button class="btn sec" id="rs" style="color:var(--bad)">Start over (clears everything)</button>
+    <p class="mut" style="margin-top:16px;font-size:12px">Exercise demo photos: <a class="vid sm" href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener">Free Exercise DB</a> (public domain). Full tutorials: YouTube creators.</p>`;
   $("#ed").onclick=()=>renderOnboarding(true);
+  $("#shme").onclick=()=>openShare("workout");
   $("#sw").onclick=()=>{const w=+$("#nw").value;if(w>=30&&w<=250){profile.weightKg=w;S.set("profile",profile);const h=S.get("weights",[]);h.push([dateStr(),w]);S.set("weights",h);renderMe()}};
-  $("#rs").onclick=()=>{const b=$("#rs");if(b.dataset.sure){try{["profile","plan","log","weights"].forEach(k=>localStorage.removeItem("rozfit_"+k))}catch(e){}profile=null;render()}else{b.dataset.sure=1;b.textContent="Tap again to clear everything"}};
+  $("#rs").onclick=()=>{const b=$("#rs");if(b.dataset.sure){try{["profile","plan","log","weights","challenge"].forEach(k=>localStorage.removeItem("rozfit_"+k))}catch(e){}profile=null;render()}else{b.dataset.sure=1;b.textContent="Tap again to clear everything"}};
+}
+
+/* ---------- Stats used by share card + challenge ---------- */
+const APP_LINK = "farid-sketch.github.io/rozfit-app";
+function totalWorkouts(){const l=getLog();return Object.values(l).filter(a=>Array.isArray(a)&&a.length&&a.every(Boolean)).length}
+function startWeight(){
+  if(profile.startWeight) return profile.startWeight;
+  const h=S.get("weights",[]); return h.length?h[0][1]:profile.weightKg;
+}
+function kgLost(){return Math.max(0,Math.round((startWeight()-profile.weightKg)*10)/10)}
+
+/* ---------- 30-day challenge (all stored on the phone) ---------- */
+const CH_DAYS=30, MILESTONES=[7,14,21,30];
+function getCh(){return S.get("challenge",null)}
+function chDayIndex(ch,date=new Date()){const s=new Date(ch.start+"T00:00:00");const d=new Date(dateStr(date)+"T00:00:00");return Math.round((d-s)/864e5)} // 0-based
+function chDayDone(ch,i){
+  const d=new Date(ch.start+"T00:00:00"); d.setDate(d.getDate()+i); const k=dateStr(d);
+  return dayComplete(getLog(),k) || !!(ch.active&&ch.active[k]);
+}
+function chStats(ch){
+  const today=Math.min(chDayIndex(ch),CH_DAYS-1); let done=0;
+  for(let i=0;i<=today;i++) if(chDayDone(ch,i)) done++;
+  return {today, done, finished: chDayIndex(ch)>=CH_DAYS};
+}
+function renderChallenge(){
+  const ch=getCh();
+  if(!ch){
+    $("#app").innerHTML=`
+      <h1>🏆 30-day RozFit challenge</h1>
+      <div class="card banner"><h3>30 دن کا چیلنج</h3>
+        <p>Move every day for 30 days. Do your workout on gym days, and a 20-minute walk on rest days.</p>
+        <p class="mut">ہر روز حرکت کریں: جم کے دن ورزش، آرام کے دن 20 منٹ واک۔</p></div>
+      <div class="card"><ul>
+        <li>✅ A day counts when you finish your workout, or tick "active rest" on a rest day</li>
+        <li>🎖 Badges and a share card at day 7, 14, 21 and 30</li>
+        <li>📤 Share on WhatsApp status or Instagram and challenge your friends</li></ul></div>
+      <button class="btn huge" id="join">Join the challenge – start today</button>`;
+    $("#join").onclick=()=>{S.set("challenge",{start:dateStr(),active:{},shown:[]});renderChallenge()};
+    return;
+  }
+  const st=chStats(ch); const todayK=dateStr();
+  const isRest=!profile.days.includes(todayKey());
+  const todayDone=chDayDone(ch,st.today);
+  let cells="";
+  for(let i=0;i<CH_DAYS;i++){
+    const past=i<st.today||(i===st.today&&st.finished), cur=i===st.today&&!st.finished, ok=i<=st.today&&chDayDone(ch,i);
+    cells+=`<div class="cd ${ok?"ok":past?"miss":""} ${cur?"cur":""} ${MILESTONES.includes(i+1)?"ms":""}">${ok?"✓":i+1}</div>`;
+  }
+  const reached=MILESTONES.filter(m=>st.done>=m);
+  $("#app").innerHTML=`
+    <h1>🏆 30-day challenge</h1>
+    <p class="mut">Started ${ch.start} · ${st.finished?"finished":"day "+(st.today+1)+" of 30"}</p>
+    <div class="stat"><div class="card"><div class="mut">Days done</div><div class="big">${st.done}<span class="mut" style="font-size:18px">/30</span></div></div>
+      <div class="card"><div class="mut">Next badge</div><div class="big">${(MILESTONES.find(m=>m>st.done)||"🏁")}</div><div class="mut">${MILESTONES.find(m=>m>st.done)?"days":"all done"}</div></div></div>
+    <div class="bar" style="margin:10px 0"><i style="width:${st.done/CH_DAYS*100}%"></i></div>
+    <div class="cgrid">${cells}</div>
+    ${st.finished?"":todayDone?`<div class="card" style="text-align:center"><b>✅ Today is done!</b><p class="mut">آج کا دن مکمل</p></div>`:
+      isRest?`<button class="btn huge" id="act">✓ I did a 20-min walk today (active rest)</button>`:
+      `<button class="btn huge" id="gotw">▶ Do today's workout</button>`}
+    <div class="card"><h3>🎖 Badges</h3><div class="badges">${MILESTONES.map(m=>`<span class="badge ${reached.includes(m)?"on":""}">${m===30?"🏆":"🎖"} ${m} days</span>`).join("")}</div></div>
+    <button class="btn" id="shch">📤 Share my challenge progress</button>
+    <button class="btn sec" id="quit">Restart challenge</button>`;
+  const a=$("#act"); if(a)a.onclick=()=>{ch.active=ch.active||{};ch.active[todayK]=true;S.set("challenge",ch);renderChallenge();checkMilestone()};
+  const g=$("#gotw"); if(g)g.onclick=()=>{tab="today";render()};
+  $("#shch").onclick=()=>openShare("challenge");
+  $("#quit").onclick=()=>{const b=$("#quit");if(b.dataset.sure){S.set("challenge",null);renderChallenge()}else{b.dataset.sure=1;b.textContent="Tap again to restart from day 1"}};
+}
+/* Show a milestone share card once, the first time a badge is reached */
+function checkMilestone(){
+  const ch=getCh(); if(!ch)return false;
+  const st=chStats(ch); ch.shown=ch.shown||[];
+  const m=MILESTONES.filter(x=>st.done>=x&&!ch.shown.includes(x)).pop();
+  if(!m)return false;
+  ch.shown.push(...MILESTONES.filter(x=>x<=m&&!ch.shown.includes(x))); S.set("challenge",ch);
+  openShare("challenge",m); return true;
+}
+
+/* ---------- Share card (drawn on a canvas, 1080x1920 = story size) ---------- */
+const URDU_FONT='"Noto Nastaliq Urdu","Jameel Noori Nastaleeq","Geeza Pro","Noto Naskh Arabic",Tahoma,sans-serif';
+const EN_FONT='-apple-system,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif';
+function drawCard(kind,milestone){
+  const W=1080,H=1920,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,"#052e16");g.addColorStop(.55,"#0f172a");g.addColorStop(1,"#020617");
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  // soft glow
+  const rg=x.createRadialGradient(W*.8,H*.15,10,W*.8,H*.15,700);rg.addColorStop(0,"rgba(34,197,94,.35)");rg.addColorStop(1,"rgba(34,197,94,0)");x.fillStyle=rg;x.fillRect(0,0,W,H);
+  const T=(t,y,size,col="#e2e8f0",w=800,font=EN_FONT,align="center",rtl=false)=>{x.font=`${w} ${size}px ${font}`;x.fillStyle=col;x.textAlign=align;x.direction=rtl?"rtl":"ltr";x.fillText(t,align==="center"?W/2:align==="right"?W-90:90,y);x.direction="ltr"};
+  // brand
+  x.fillStyle="#22c55e";x.beginPath();x.roundRect?x.roundRect(90,110,110,110,28):x.rect(90,110,110,110);x.fill();
+  x.fillStyle="#052e16";x.fillRect(112,160,66,12);x.fillRect(118,138,12,56);x.fillRect(160,138,12,56);
+  x.font=`900 84px ${EN_FONT}`;
+  x.fillStyle="#fff";x.textAlign="left";x.fillText("RozFit",230,195);
+  x.font=`500 34px ${EN_FONT}`;x.fillStyle="#94a3b8";x.fillText("your free daily gym plan",232,240);
+  const name=(profile.name||"").trim();
+  const st=streak(), tw=totalWorkouts(), kl=kgLost();
+  let y=470;
+  if(kind==="challenge"){
+    const ch=getCh(); const cs=ch?chStats(ch):{done:0}; const day=milestone||cs.done;
+    y=420;
+    T(milestone?`🎖 ${milestone}-day badge unlocked!`:"30-day RozFit challenge",y,58,"#86efac",800);y+=85;
+    T("30 دن کا چیلنج",y,58,"#e2e8f0",700,URDU_FONT,"center",true);y+=230;
+    T(String(day),y,230,"#22c55e",900);y+=85;
+    T("of 30 days done",y,52,"#e2e8f0",700);y+=80;
+    T(`${day} دن مکمل`,y,56,"#e2e8f0",700,URDU_FONT,"center",true);y+=60;
+    // mini grid
+    const s=48,gap=12,cols=10,gx=(W-(cols*s+(cols-1)*gap))/2;
+    for(let i=0;i<30;i++){const cx=gx+(i%cols)*(s+gap),cy=y+Math.floor(i/cols)*(s+gap);x.fillStyle=i<day?"#22c55e":"rgba(148,163,184,.25)";x.beginPath();x.roundRect?x.roundRect(cx,cy,s,s,12):x.rect(cx,cy,s,s);x.fill()}
+    y+=3*(s+gap)+60;
+  }else{
+    y=420;
+    T("Workout complete! 💪",y,64,"#86efac",800);y+=90;
+    T("آج کی ورزش مکمل",y,60,"#e2e8f0",700,URDU_FONT,"center",true);y+=130;
+    T("🔥",y,110,"#ffffff",400);y+=30;
+    T(String(st),y+190,220,"#ffffff",900);y+=270;
+    T(`${st===1?"day":"days"} in a row`,y,56,"#e2e8f0",700);y+=85;
+    T(`${st} دن مسلسل`,y,60,"#cbd5e1",700,URDU_FONT,"center",true);y+=90;
+  }
+  // stat boxes
+  const boxes=[[String(tw),"workouts","ورزشیں"],[kl>0?kl+" kg":"—","lost","وزن کم"],[String(st),"streak","مسلسل"]];
+  const bw=280,bh=240,bg=30,bx=(W-(3*bw+2*bg))/2; y=Math.max(y,1180); y=Math.min(y,1210);
+  boxes.forEach((b,i)=>{const X=bx+i*(bw+bg);x.fillStyle="rgba(30,41,59,.9)";x.beginPath();x.roundRect?x.roundRect(X,y,bw,bh,30):x.rect(X,y,bw,bh);x.fill();
+    x.textAlign="center";x.fillStyle="#22c55e";x.font=`900 76px ${EN_FONT}`;x.fillText(b[0],X+bw/2,y+100);
+    x.fillStyle="#e2e8f0";x.font=`600 38px ${EN_FONT}`;x.fillText(b[1],X+bw/2,y+160);
+    x.fillStyle="#94a3b8";x.direction="rtl";x.font=`600 36px ${URDU_FONT}`;x.fillText(b[2],X+bw/2,y+215);x.direction="ltr";});
+  y+=bh+80;
+  if(name){T(`— ${name}`,y,42,"#94a3b8",600);}
+  // footer CTA
+  x.fillStyle="#22c55e";x.beginPath();x.roundRect?x.roundRect(90,H-330,W-180,200,40):x.rect(90,H-330,W-180,200);x.fill();
+  x.textAlign="center";x.fillStyle="#052e16";x.font=`900 50px ${EN_FONT}`;x.fillText("Join me free on RozFit",W/2,H-260);
+  x.direction="rtl";x.font=`700 44px ${URDU_FONT}`;x.fillText("میرے ساتھ مفت جوائن کریں",W/2,H-200);x.direction="ltr";
+  x.font=`600 36px ${EN_FONT}`;x.fillStyle="#94a3b8";x.fillText(APP_LINK,W/2,H-70);
+  return c;
+}
+function openShare(kind,milestone){
+  const c=drawCard(kind,milestone); const url=c.toDataURL("image/png");
+  let file=null; c.toBlob(b=>{if(b)file=new File([b],"rozfit-progress.png",{type:"image/png"})},"image/png");
+  const text=(kind==="challenge"?(milestone?`I just hit day ${milestone} of the 30-day RozFit challenge! 🎖`:"My 30-day RozFit challenge progress 💪"):`I finished today's workout on RozFit! 🔥 ${streak()} in a row`)+` Join me free: https://${APP_LINK}/`;
+  const ov=document.createElement("div");ov.className="guide";document.body.appendChild(ov);document.body.style.overflow="hidden";
+  ov.innerHTML=`<div class="gin" style="text-align:center">
+    <div class="gtop"><button class="gx" id="sclose">✕</button><span>${milestone?"🎖 Badge unlocked!":"Share your progress"}</span><span></span></div>
+    <img src="${url}" alt="Your RozFit progress card" class="shimg">
+    <button class="btn huge" id="sshare">📤 Share to WhatsApp / Instagram</button>
+    <button class="btn sec" id="ssave">⬇ Save image</button>
+    <p class="mut" id="shint">Tip: you can also press and hold the picture to save it.</p></div>`;
+  const close=()=>{ov.remove();document.body.style.overflow="";render()};
+  $("#sclose").onclick=close;
+  $("#sshare").onclick=async()=>{
+    try{
+      if(file&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text});return}
+      if(navigator.share){await navigator.share({text,url:`https://${APP_LINK}/`});return}
+    }catch(e){if(e&&e.name==="AbortError")return}
+    $("#shint").textContent="Sharing isn't available here. Tap Save image, then post it from your gallery.";
+  };
+  $("#ssave").onclick=()=>{
+    const a=document.createElement("a");a.href=url;a.download="rozfit-progress.png";document.body.appendChild(a);a.click();a.remove();
+    $("#shint").textContent="If nothing downloaded, press and hold the picture and choose \"Save to Photos\".";
+  };
 }
 
 /* ---------- Router ---------- */
@@ -613,6 +856,7 @@ function render(){
   else if(tab==="day")renderDay(viewDay);
   else if(tab==="week")renderWeek();
   else if(tab==="diet")renderDiet();
+  else if(tab==="challenge")renderChallenge();
   else renderMe();
   window.scrollTo(0,0);
 }

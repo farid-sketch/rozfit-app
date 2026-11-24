@@ -37,3 +37,8 @@ Until a video is added, the app shows "Video coming soon" plus a free YouTube se
 - Progress is saved on the phone only. Changing phone or clearing Chrome data loses it.
 - Plans are rule-based (not AI). They cover 1–7 days a week, gym or home, beginner to advanced.
 - General guidance only, not medical advice (a note says so in the app).
+
+## Credits
+Exercise demo photos (`demos/`) come from the [Free Exercise DB](https://github.com/yuhonas/free-exercise-db),
+released into the public domain under the Unlicense. Each demo loops the start and end photo of the rep (about 2.4 seconds).
+Full tutorials link to YouTube videos (embedded, owned by their creators).
